@@ -1,6 +1,10 @@
 # See README.md for usage information
 define apache::vhost(
   $docroot,
+  $docroot_selrange            = 's0',
+  $docroot_selrole             = 'object_r',
+  $docroot_seltype             = 'httpd_sys_content_t',
+  $docroot_seluser             = 'system_u',
   $manage_docroot              = true,
   $virtual_docroot             = false,
   $port                        = undef,
@@ -252,6 +256,22 @@ define apache::vhost(
     validate_string($docroot)
   }
 
+  if $docroot_selrange {
+    validate_string($docroot_selrange)
+  }
+
+  if $docroot_selrole {
+    validate_string($docroot_selrole)
+  }
+
+  if $docroot_seltype {
+    validate_string($docroot_seltype)
+  }
+
+  if $docroot_seluser {
+    validate_string($docroot_seluser)
+  }
+
   if $ssl_proxy_verify {
     validate_re($ssl_proxy_verify,'^(none|optional|require|optional_no_ca)$',"${ssl_proxy_verify} is not permitted for ssl_proxy_verify. Allowed values are 'none', 'optional', 'require' or 'optional_no_ca'.")
   }
@@ -316,13 +336,28 @@ define apache::vhost(
   # This ensures that the docroot exists
   # But enables it to be specified across multiple vhost resources
   if $manage_docroot and $docroot and ! defined(File[$docroot]) {
-    file { $docroot:
-      ensure  => directory,
-      owner   => $docroot_owner,
-      group   => $docroot_group,
-      mode    => $docroot_mode,
-      require => Package['httpd'],
-      before  => Concat["${priority_real}${filename}.conf"],
+    if $::selinux {
+      file { $docroot:
+        ensure   => directory,
+        owner    => $docroot_owner,
+        group    => $docroot_group,
+        mode     => $docroot_mode,
+        selrange => $docroot_selrange,
+        selrole  => $docroot_selrole,
+        seltype  => $docroot_seltype,
+        seluser  => $docroot_seluser,
+        require  => Package['httpd'],
+        before   => Concat["${priority_real}${filename}.conf"],
+      }
+    } else {
+      file { $docroot:
+        ensure  => directory,
+        owner   => $docroot_owner,
+        group   => $docroot_group,
+        mode    => $docroot_mode,
+        require => Package['httpd'],
+        before  => Concat["${priority_real}${filename}.conf"],
+      }
     }
   }
 
