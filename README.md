@@ -96,6 +96,10 @@
 [`directories`]: #parameter-directories-for-apachevhost
 [`DirectoryIndex`]: https://httpd.apache.org/docs/current/mod/mod_dir.html#directoryindex
 [`docroot`]: #docroot
+[`docroot_selrange`]: #docroot_selrange
+[`docroot_selrole`]: #docroot_selrole
+[`docroot_seltype`]: #docroot_seltype
+[`docroot_seluser`]: #docroot_seluser
 [`docroot_owner`]: #docroot_owner
 [`docroot_group`]: #docroot_group
 [`DocumentRoot`]: https://httpd.apache.org/docs/current/mod/core.html#documentroot
@@ -2121,6 +2125,22 @@ Sets the list of resources to look for when a client requests an index of the di
 **Required**. Sets the [`DocumentRoot`][] location, from which Apache serves files.
 
 If `docroot` and [`manage_docroot`][] are both set to false, no [`DocumentRoot`][] will be set and the accompanying `<Directory /path/to/directory>` block will not be created.
+
+##### `docroot_selrange`
+
+When SELinux is enabled and [`manage_docroot`][] is set to true, this is used to set Multi-Level Security (MLS) and/or Multi-Category Security (MCS).  Default: 's0'.
+
+##### `docroot_selrole`
+
+When SELinux is enabled and [`manage_docroot`][] is set to true, this sets the SELinux role for the directory.  Default: 'object_r'.
+
+##### `docroot_seltype`
+
+When SELinux is enabled and [`manage_docroot`][] is set to true, this sets the SELinux type for the directory.  Default: 'httpd_sys_content_t'.
+
+##### `docroot_seluser`
+
+When SELinux is enabled and [`manage_docroot`][] is set to true, this sets the SELinux user for the directory.  Default: 'system_u' .
 
 ##### `docroot_group`
 
